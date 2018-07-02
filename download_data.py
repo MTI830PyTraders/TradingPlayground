@@ -14,6 +14,7 @@ def _get_cashflow_data(beginning_date: str, ending_date: str, ticker: str, api_k
                            ticker=ticker,
                            dimension='MRQ',
                            calendardate={'gte': beginning_date, 'lte': ending_date})
+    check_empty_df(cashflow_df)
     cashflow_df = cashflow_df.sort_values(by='calendardate')
     cashflow_df = cashflow_df[['calendardate', 'fcf']].set_index('calendardate')
     idx = pd.date_range(beginning_date, ending_date)
@@ -26,6 +27,7 @@ def _get_cashflow_data(beginning_date: str, ending_date: str, ticker: str, api_k
 def _get_stocks_data_from_wikip(beginning_date: str, ending_date: str, ticker: str, api_key: str) -> pd.DataFrame:
     quandl.ApiConfig.api_key = api_key
     stocks_df = quandl.get_table('WIKI/PRICES', date={'gte': beginning_date, 'lte': ending_date}, ticker=ticker)
+    check_empty_df(stocks_df)
     stocks_df = stocks_df[['date', 'close']]
     stocks_df = stocks_df.sort_values(by='date')
     stocks_df = stocks_df.set_index('date')
@@ -41,6 +43,7 @@ def _get_stocks_data_from_morningstar(beginning_date: str, ending_date: str, tic
     start = datetime.strptime(beginning_date, '%Y-%m-%d')
     end = datetime.strptime(ending_date, '%Y-%m-%d')
     stocks_df = web.DataReader(ticker, 'morningstar', start, end)
+    check_empty_df(stocks_df)
     stocks_df = stocks_df[['Close']]
     #stocks_df = stocks_df.sort_values(by='Date')
     stocks_df = stocks_df.set_index('Date')
@@ -55,6 +58,7 @@ def _get_stocks_data_from_morningstar(beginning_date: str, ending_date: str, tic
 def _get_sentiments_data(beginning_date: str, ending_date: str, ticker: str, api_key: str) -> pd.DataFrame:
     quandl.ApiConfig.api_key = api_key
     sentiments_df = quandl.get(f'NS1/{ticker}_US', start_date=beginning_date, end_date=ending_date)
+    check_empty_df(sentiments_df)
     sentiments_df = sentiments_df[['Sentiment']]
     return sentiments_df
 
@@ -94,3 +98,8 @@ def get_training_dataset(beginning_date: str, ending_date: str, ticker: str) -> 
     final_df.to_csv(saved_file)
 
     return final_df
+
+
+def check_empty_df(df: pd.DataFrame):
+    if df.empty:
+        raise ValueError('df is empty.')
