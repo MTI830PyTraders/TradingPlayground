@@ -3,3 +3,4 @@ Quandl==3.3.0
 Keras==2.2.0
 tensorflow-gpu==1.8.0
 pandas-datareader==0.6.0
+sklearn
