@@ -16,7 +16,7 @@ def _get_cashflow_data(beginning_date: str, ending_date: str, ticker: str, api_k
                            calendardate={'gte': beginning_date, 'lte': ending_date})
     check_empty_df(cashflow_df)
     cashflow_df = cashflow_df.sort_values(by='calendardate')
-    cashflow_df = cashflow_df[['calendardate', 'fcf']].set_index('calendardate')
+    cashflow_df = cashflow_df[['calendardate', 'fcf', 'fcfps']].set_index('calendardate')
     idx = pd.date_range(beginning_date, ending_date)
     cashflow_df.index = pd.DatetimeIndex(cashflow_df.index)
     cashflow_df = cashflow_df.reindex(idx, fill_value=np.NaN)
