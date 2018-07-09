@@ -27,6 +27,14 @@ model.compile(optimizer='rmsprop',
               loss='mean_squared_error',
               metrics=['accuracy'])
 
-model.fit(train_x, train_y, epochs=10, batch_size=32)
+model.fit(train_x, train_y, epochs=10, batch_size=32
+          # ,validation_split=0.10
+          )
 
+model_json = model.to_json()
+with open('model.json', 'w') as json_file:
+    json_file.write(model_json)
 
+model.save_weights('model.h5')
+
+print('saved model!')
