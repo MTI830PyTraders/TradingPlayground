@@ -9,24 +9,28 @@ import os
 
 
 def _get_cashflow_data(beginning_date: str, ending_date: str, ticker: str, api_key: str) -> pd.DataFrame:
+
     quandl.ApiConfig.api_key = api_key
     cashflow_df = quandl.get_table('SHARADAR/SF1',
-                           ticker=ticker,
-                           dimension='MRQ',
-                           calendardate={'gte': beginning_date, 'lte': ending_date})
+                                   ticker=ticker,
+                                   dimension='MRQ',
+                                   calendardate={'gte': beginning_date, 'lte': ending_date},
+                                   paginate=True)
     check_empty_df(cashflow_df)
     cashflow_df = cashflow_df.sort_values(by='calendardate')
     cashflow_df = cashflow_df[['calendardate', 'fcf']].set_index('calendardate')
     idx = pd.date_range(beginning_date, ending_date)
     cashflow_df.index = pd.DatetimeIndex(cashflow_df.index)
     cashflow_df = cashflow_df.reindex(idx, fill_value=np.NaN)
+
     cashflow_df = cashflow_df.interpolate(limit_direction='both')
     return cashflow_df
 
 
 def _get_stocks_data_from_wikip(beginning_date: str, ending_date: str, ticker: str, api_key: str) -> pd.DataFrame:
     quandl.ApiConfig.api_key = api_key
-    stocks_df = quandl.get_table('WIKI/PRICES', date={'gte': beginning_date, 'lte': ending_date}, ticker=ticker)
+    stocks_df = quandl.get_table(
+        'WIKI/PRICES', date={'gte': beginning_date, 'lte': ending_date}, ticker=ticker, paginate=True)
     check_empty_df(stocks_df)
     stocks_df = stocks_df[['date', 'close']]
     stocks_df = stocks_df.sort_values(by='date')
@@ -57,7 +61,7 @@ def _get_stocks_data_from_morningstar(beginning_date: str, ending_date: str, tic
 
 def _get_sentiments_data(beginning_date: str, ending_date: str, ticker: str, api_key: str) -> pd.DataFrame:
     quandl.ApiConfig.api_key = api_key
-    sentiments_df = quandl.get(f'NS1/{ticker}_US', start_date=beginning_date, end_date=ending_date)
+    sentiments_df = quandl.get(f'NS1/{ticker}_US', start_date=beginning_date, end_date=ending_date, paginate=True)
     check_empty_df(sentiments_df)
     sentiments_df = sentiments_df[['Sentiment']]
     return sentiments_df
