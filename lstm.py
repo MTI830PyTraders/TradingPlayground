@@ -20,7 +20,7 @@ TICKER = 'TSLA'
 # These parameters will tweak the model
 BATCH_SIZE = 30
 LOSS = 'mean_squared_error'
-N_HIDDEN = 20000
+N_HIDDEN = 300
 NUM_EPOCHS = 25
 NUM_TIMESTEPS = 90
 OPTIMIZER = 'adam'
@@ -148,7 +148,7 @@ def create_model(units: int,
     create and return the model
     """
     model = Sequential()
-    model.add(LSTM(num_timesteps,
+    model.add(LSTM(N_HIDDEN,
                    input_shape=(num_timesteps, units),
                    batch_input_shape=(batch_size, num_timesteps, units),
                    return_sequences=True))
