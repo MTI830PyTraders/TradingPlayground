@@ -4,8 +4,8 @@ import typing
 import download_data
 
 from keras.models import Sequential, load_model
-from keras.layers.core import Dense
-from keras.layers import LSTM
+from keras.layers.core import Dense, Dropout, Activation
+from keras.layers import LSTM, CuDNNLSTM
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,13 +15,13 @@ from sklearn import preprocessing
 # Parameters of what data to select
 BEGINNING_DATE = '2013-03-31'
 ENDING_DATE = '2018-03-31'
-TICKER = 'TSLA'
+TICKER = 'MSFT'
 
 # These parameters will tweak the model
 BATCH_SIZE = 30
-LOSS = 'mean_squared_error'
-N_HIDDEN = 300
-NUM_EPOCHS = 25
+LOSS = 'mae'
+N_HIDDEN = 1000
+NUM_EPOCHS = 20
 NUM_TIMESTEPS = 90
 OPTIMIZER = 'adam'
 TIMESTEPS_AHEAD = 1
@@ -30,18 +30,14 @@ VERBOSE = 0
 # percentage of the data that will be used to train the model.
 # the test ration is the ratio below minus the backtest ratio.
 # so for example: 1.0 - 0.75 - 0.1 = 0.15 for test data
-TRAIN_TEST_RATIO = 0.75
-
-# percentage of the data that will be used to "backtest" the model.
-# this data is used to do a prediction based on data that wasn't seen by the model during training.
-BACKTEST_RATIO = 0.1
+TRAIN_TEST_RATIO = 0.8
 
 # setting the random seed allow to make the experiment reproductible
-SEED =1337
+SEED = 1337
 np.random.seed(SEED)
 
 
-def get_training_data(beginning_date: str, ending_date: str, ticker: str) -> typing.Tuple[np.ndarray, preprocessing.MinMaxScaler, preprocessing.MinMaxScaler, preprocessing.MinMaxScaler]:
+def get_training_data(beginning_date: str, ending_date: str, ticker: str) -> typing.Tuple[np.ndarray, preprocessing.MinMaxScaler]:
     """
     Select the data for training the model.
     All the data will be normalized to a value between -1 and 1 to make it easier to train the model.
@@ -53,6 +49,7 @@ def get_training_data(beginning_date: str, ending_date: str, ticker: str) -> typ
 
     sentiments_scaler = preprocessing.MinMaxScaler()
     close_scaler = preprocessing.MinMaxScaler()
+    close_p_scaler = preprocessing.MinMaxScaler()
     fcf_scaler = preprocessing.MinMaxScaler()
 
     sentiments = train_data['Sentiment'].values.astype(float)
@@ -61,14 +58,18 @@ def get_training_data(beginning_date: str, ending_date: str, ticker: str) -> typ
 
     close = train_data['close'].values.astype(float)
     close = np.array(close).reshape((len(close), 1))
+
+    close_p = (close[1:] - close[:-1]) / close[1:]
+    close_p = close_p_scaler.fit_transform(close_p)
+
     close = close_scaler.fit_transform(close)
 
-    fcf = train_data['fcfps'].values.astype(float)
+    fcf = train_data['fcf'].values.astype(float)
     fcf = np.array(fcf).reshape((len(fcf), 1))
     fcf = fcf_scaler.fit_transform(fcf)
 
-    data = np.concatenate((sentiments, close, fcf), axis=1)
-    return data, sentiments_scaler, close_scaler, fcf_scaler
+    data = np.concatenate((close[1:], close_p, sentiments[1:], fcf[1:]), axis=1)
+    return data, close_scaler
 
 
 def process_data_for_lstm(data: np.ndarray, num_timesteps: int, timesteps_ahead: int) -> typing.Tuple[np.ndarray, np.ndarray]:
@@ -112,8 +113,7 @@ def process_data_for_lstm(data: np.ndarray, num_timesteps: int, timesteps_ahead:
 def divide_data_into_train_test(x: np.ndarray,
                                 y: np.ndarray,
                                 ratio: float,
-                                bt_ratio: float,
-                                batch_size: int) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+                                batch_size: int) -> typing.Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     receives the training data as numpy arrays. Will divide the data as follow:
     training data: main data used for training. will be the ratio of x and y
@@ -121,22 +121,19 @@ def divide_data_into_train_test(x: np.ndarray,
     backtest data: used to do a prediction once training is finished. will be bt_ratio of the data
     """
     sp = int(ratio * len(x))
-    bt = int(bt_ratio * len(x))
 
-    xtrain, xtest, ytrain, ytest, xbtest, ybtest = x[0:sp], x[sp:sp+bt], y[0:sp], y[sp:sp+bt], x[:bt], y[:bt]
-    print(xtrain.shape, xtest.shape, xbtest.shape, ytrain.shape, ytest.shape, ybtest.shape)
+    xtrain, xtest, ytrain, ytest = x[0:sp], x[sp:], y[0:sp], y[sp:]
+    print(xtrain.shape, xtest.shape, ytrain.shape, ytest.shape)
 
     train_size = (xtrain.shape[0] // batch_size) * batch_size
     test_size = (xtest.shape[0] // batch_size) * batch_size
-    btest_size = (xbtest.shape[0] // batch_size) * batch_size
 
     xtrain, ytrain = xtrain[0:train_size], ytrain[0:train_size]
     xtest, ytest = xtest[0:test_size], ytest[0:test_size]
-    xbtest, ybtest = xbtest[0:btest_size], ybtest[0:btest_size]
 
-    print(xtrain.shape, xtest.shape, xbtest.shape, ytrain.shape, ytest.shape, ybtest.shape)
+    print(xtrain.shape, xtest.shape, ytrain.shape, ytest.shape)
 
-    return xtrain, xtest, ytrain, ytest, xbtest, ybtest
+    return xtrain, xtest, ytrain, ytest
 
 
 def create_model(units: int,
@@ -148,12 +145,15 @@ def create_model(units: int,
     create and return the model
     """
     model = Sequential()
-    model.add(LSTM(N_HIDDEN,
-                   input_shape=(num_timesteps, units),
-                   batch_input_shape=(batch_size, num_timesteps, units),
-                   return_sequences=True))
+    model.add(CuDNNLSTM(N_HIDDEN,
+                        input_shape=(num_timesteps, units),
+                        batch_input_shape=(batch_size, num_timesteps, units),
+                        return_sequences=True))
+    model.add(Dropout(0.1))
+    model.add(CuDNNLSTM(N_HIDDEN, return_sequences=True))
+    model.add(Dropout(0.1))
     model.add(Dense(units))
-
+    model.add(Activation('linear'))
     model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
 
     return model
@@ -171,12 +171,12 @@ def train_model(model: Sequential,
     according to https://github.com/PacktPublishing/Deep-Learning-with-Keras/blob/master/Chapter06/econs_stateful.py
     we need to do a for loop and reset the state if we want to train a LSTM in a stateful way.
     """
-    for i in range(num_epochs):
+    for i in range(1):
         print("Epoch {:d}/{:d}".format(i + 1, num_epochs))
         model.fit(xtrain,
                   ytrain,
                   batch_size=batch_size,
-                  epochs=1,
+                  epochs=num_epochs,
                   validation_data=(xtest, ytest),
                   shuffle=False)
         model.reset_states()
@@ -208,42 +208,37 @@ def show_prediction(prediction: np.ndarray, reality: np.ndarray):
     :param reality:
     :return:
     """
-    plt.plot(prediction[:, 0])
-    plt.plot(reality[:, 0])
-    plt.show()
-    plt.plot(prediction[:, 1])
-    plt.plot(reality[:, 1])
-    plt.show()
-    plt.plot(prediction[:, 2])
-    plt.plot(reality[:, 2])
+    print('Predicted variation:', ((prediction[-1, 0] - prediction[1, 0]) / prediction[-1, 0]) * 100)
+    print('Actual variation:', ((reality[-1, 0] - reality[1, 0]) / reality[-1, 0]) * 100)
+
+    print('Expected sum value: ', sum(prediction[:, 0]))
+    print('Real sum value: ', sum(reality[:, 0]))
+
+    plt.plot(prediction[:, 0], label='prediction')
+    plt.plot(reality[:, 0], label='reality')
+    plt.legend(('prediction', 'reality'))
     plt.show()
 
 
-def scale_back_to_normal(data: np.ndarray,
-                         sentiments_scaler: preprocessing.MinMaxScaler,
-                         close_scaler: preprocessing.MinMaxScaler,
-                         fcf_scaler: preprocessing.MinMaxScaler) -> np.ndarray:
+def scale_back_to_normal(data: np.ndarray, scaler: preprocessing.MinMaxScaler) -> np.ndarray:
     """
     receives data that was normalized as well as the MinMaxScalers used to do so.
     put the data back to normal and returns the result.
     """
-    sents = data[:, 0]
-    sents = sents.reshape(len(sents), 1)
-    sents = sentiments_scaler.inverse_transform(sents)
-    close = data[:, 1]
-    close = close.reshape(len(close), 1)
-    close = close_scaler.inverse_transform(close)
-    fcf = data[:, 2]
-    fcf = fcf.reshape(len(fcf), 1)
-    fcf = fcf_scaler.inverse_transform(fcf)
-    return np.concatenate((sents, close, fcf), axis=1)
+    if len(data.shape) == 3:
+        col = data[:, 0]
+        col = col.reshape(len(col), 1)
+        col = scaler.inverse_transform(col)
+        return np.concatenate((col, data[:, 1:]), axis=1)
+    else:
+        return scaler.inverse_transform(data)
 
 
 if __name__ == '__main__':
     # actual code is done here. It is not wrapped in a function so that variables can be checked in a python console.
-    data, sentiments_scaler, close_scaler, fcf_scaler = get_training_data(BEGINNING_DATE, ENDING_DATE, TICKER)
+    data, scaler = get_training_data(BEGINNING_DATE, ENDING_DATE, TICKER)
     x, y = process_data_for_lstm(data, NUM_TIMESTEPS, TIMESTEPS_AHEAD)
-    xtrain, xtest, ytrain, ytest, xbtest, ybtest = divide_data_into_train_test(x, y, TRAIN_TEST_RATIO, BACKTEST_RATIO, BATCH_SIZE)
+    xtrain, xtest, ytrain, ytest = divide_data_into_train_test(x, y, TRAIN_TEST_RATIO, BATCH_SIZE)
     #model = load_trained_model()
     model = create_model(data.shape[1], NUM_TIMESTEPS, BATCH_SIZE, OPTIMIZER, LOSS)
     train_model(model, NUM_EPOCHS, BATCH_SIZE, xtrain, ytrain, xtest, ytest)
@@ -251,7 +246,7 @@ if __name__ == '__main__':
         os.mkdir('models')
     model.save('models/lstm.h5')
 
-    prediction = try_prediction(xbtest, model)
-    prediction = scale_back_to_normal(prediction, sentiments_scaler, close_scaler, fcf_scaler)
-    test_data = scale_back_to_normal(xbtest[BATCH_SIZE+NUM_TIMESTEPS], sentiments_scaler, close_scaler, fcf_scaler)
+    prediction = try_prediction(xtest, model)
+    prediction = scale_back_to_normal(prediction, scaler)
+    test_data = scale_back_to_normal(ytest[0], scaler)
     show_prediction(prediction, test_data)
