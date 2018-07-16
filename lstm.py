@@ -12,29 +12,6 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 
-# Parameters of what data to select
-BEGINNING_DATE = '2013-03-31'
-ENDING_DATE = '2018-03-31'
-TICKER = 'MSFT'
-
-# These parameters will tweak the model
-BATCH_SIZE = 90
-LOSS = 'mae'
-N_HIDDEN = 1000
-NUM_EPOCHS = 100
-SAVE_EVERY = 10
-NUM_TIMESTEPS = 180
-OPTIMIZER = 'adam'
-TIMESTEPS_AHEAD = 90
-VERBOSE = 0
-
-# percentage of the data that will be used to train the model.
-TRAIN_TEST_RATIO = 0.8
-
-# setting the random seed allow to make the experiment reproductible
-SEED = 1337
-np.random.seed(SEED)
-
 
 def get_training_data(beginning_date: str, ending_date: str, ticker: str) -> typing.Tuple[np.ndarray, preprocessing.MinMaxScaler]:
     """
@@ -226,23 +203,3 @@ def scale_back_to_normal(data: np.ndarray, scaler: preprocessing.MinMaxScaler) -
         return np.concatenate((col, data[:, 1:]), axis=1)
     else:
         return scaler.inverse_transform(data)
-
-
-if __name__ == '__main__':
-    # actual code is done here. It is not wrapped in a function so that variables can be checked in a python console.
-    data, scaler = get_training_data(BEGINNING_DATE, ENDING_DATE, TICKER)
-    x, y = process_data_for_lstm(data, NUM_TIMESTEPS, TIMESTEPS_AHEAD)
-    xtrain, xtest, ytrain, ytest = divide_data_into_train_test(x, y, TRAIN_TEST_RATIO, BATCH_SIZE)
-    #model = load_trained_model()
-    model = create_model(data.shape[1], NUM_TIMESTEPS, BATCH_SIZE, OPTIMIZER, LOSS)
-
-    for i in range(NUM_EPOCHS // SAVE_EVERY):
-        train_model(model, SAVE_EVERY, BATCH_SIZE, xtrain, ytrain, xtest, ytest)
-        if not os.path.exists('models'):
-            os.mkdir('models')
-        model.save('models/lstm.h5')
-
-        prediction = try_prediction(xtest, model)
-        prediction = scale_back_to_normal(prediction, scaler)
-        test_data = scale_back_to_normal(ytest[BATCH_SIZE], scaler)
-        show_prediction(prediction, test_data)
