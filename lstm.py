@@ -18,13 +18,14 @@ ENDING_DATE = '2018-03-31'
 TICKER = 'MSFT'
 
 # These parameters will tweak the model
-BATCH_SIZE = 30
+BATCH_SIZE = 90
 LOSS = 'mae'
 N_HIDDEN = 1000
-NUM_EPOCHS = 20
-NUM_TIMESTEPS = 90
+NUM_EPOCHS = 100
+SAVE_EVERY = 10
+NUM_TIMESTEPS = 180
 OPTIMIZER = 'adam'
-TIMESTEPS_AHEAD = 1
+TIMESTEPS_AHEAD = 90
 VERBOSE = 0
 
 # percentage of the data that will be used to train the model.
@@ -153,7 +154,7 @@ def create_model(units: int,
     model.add(CuDNNLSTM(N_HIDDEN, return_sequences=True))
     model.add(Dropout(0.1))
     model.add(Dense(units))
-    model.add(Activation('linear'))
+    #model.add(Activation('linear'))
     model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
 
     return model
@@ -171,12 +172,12 @@ def train_model(model: Sequential,
     according to https://github.com/PacktPublishing/Deep-Learning-with-Keras/blob/master/Chapter06/econs_stateful.py
     we need to do a for loop and reset the state if we want to train a LSTM in a stateful way.
     """
-    for i in range(1):
+    for i in range(num_epochs):
         print("Epoch {:d}/{:d}".format(i + 1, num_epochs))
         model.fit(xtrain,
                   ytrain,
                   batch_size=batch_size,
-                  epochs=num_epochs,
+                  epochs=1,
                   validation_data=(xtest, ytest),
                   shuffle=False)
         model.reset_states()
@@ -208,15 +209,12 @@ def show_prediction(prediction: np.ndarray, reality: np.ndarray):
     :param reality:
     :return:
     """
-    print('Predicted variation:', ((prediction[-1, 0] - prediction[1, 0]) / prediction[-1, 0]) * 100)
-    print('Actual variation:', ((reality[-1, 0] - reality[1, 0]) / reality[-1, 0]) * 100)
+    predicted_var = ((prediction[-1, 0] - prediction[1, 0]) / prediction[-1, 0]) * 100
+    actual_var = ((reality[-1, 0] - reality[1, 0]) / reality[-1, 0]) * 100
 
-    print('Expected sum value: ', sum(prediction[:, 0]))
-    print('Real sum value: ', sum(reality[:, 0]))
-
-    plt.plot(prediction[:, 0], label='prediction')
-    plt.plot(reality[:, 0], label='reality')
-    plt.legend(('prediction', 'reality'))
+    plt.plot(prediction[:, 0])
+    plt.plot(reality[:, 0])
+    plt.legend(('prediction (' + str(round(predicted_var, 2)) + ')', 'reality (' + str(round(actual_var, 2)) + ')'))
     plt.show()
 
 
@@ -241,12 +239,14 @@ if __name__ == '__main__':
     xtrain, xtest, ytrain, ytest = divide_data_into_train_test(x, y, TRAIN_TEST_RATIO, BATCH_SIZE)
     #model = load_trained_model()
     model = create_model(data.shape[1], NUM_TIMESTEPS, BATCH_SIZE, OPTIMIZER, LOSS)
-    train_model(model, NUM_EPOCHS, BATCH_SIZE, xtrain, ytrain, xtest, ytest)
-    if not os.path.exists('models'):
-        os.mkdir('models')
-    model.save('models/lstm.h5')
 
-    prediction = try_prediction(xtest, model)
-    prediction = scale_back_to_normal(prediction, scaler)
-    test_data = scale_back_to_normal(ytest[0], scaler)
-    show_prediction(prediction, test_data)
+    for i in range(NUM_EPOCHS // SAVE_EVERY):
+        train_model(model, SAVE_EVERY, BATCH_SIZE, xtrain, ytrain, xtest, ytest)
+        if not os.path.exists('models'):
+            os.mkdir('models')
+        model.save('models/lstm.h5')
+
+        prediction = try_prediction(xtest, model)
+        prediction = scale_back_to_normal(prediction, scaler)
+        test_data = scale_back_to_normal(ytest[0], scaler)
+        show_prediction(prediction, test_data)
