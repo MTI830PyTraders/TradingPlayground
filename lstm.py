@@ -248,5 +248,5 @@ if __name__ == '__main__':
 
         prediction = try_prediction(xtest, model)
         prediction = scale_back_to_normal(prediction, scaler)
-        test_data = scale_back_to_normal(ytest[0], scaler)
+        test_data = scale_back_to_normal(ytest[BATCH_SIZE], scaler)
         show_prediction(prediction, test_data)
