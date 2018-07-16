@@ -77,7 +77,7 @@ def get_sentiments_data(beginning_date: str, ending_date: str, ticker: str) -> p
     return _get_sentiments_data(beginning_date, ending_date, ticker, _FINSENTS_KEY)
 
 
-def get_training_dataset(beginning_date: str, ending_date: str, ticker: str, cashflow_columns=('calendardate', 'fcf')) -> pd.DataFrame:
+def get_training_dataset(beginning_date: str, ending_date: str, ticker: str, cashflow_columns=['calendardate', 'fcf']) -> pd.DataFrame:
     saved_file = f'cached_data/{ticker}_{beginning_date}_{ending_date}.csv'
     if os.path.exists(saved_file):
         return pd.read_csv(saved_file)

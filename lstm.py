@@ -112,6 +112,7 @@ def divide_data_into_train_test(x: np.ndarray,
 
 
 def create_model(units: int,
+                 n_hidden: int,
                  num_timesteps: int,
                  batch_size: int,
                  optimizer: str,
@@ -120,12 +121,12 @@ def create_model(units: int,
     create and return the model
     """
     model = Sequential()
-    model.add(CuDNNLSTM(N_HIDDEN,
+    model.add(CuDNNLSTM(n_hidden,
                         input_shape=(num_timesteps, units),
                         batch_input_shape=(batch_size, num_timesteps, units),
                         return_sequences=True))
     model.add(Dropout(0.1))
-    model.add(CuDNNLSTM(N_HIDDEN, return_sequences=True))
+    model.add(CuDNNLSTM(n_hidden, return_sequences=True))
     model.add(Dropout(0.1))
     model.add(Dense(units))
     model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
@@ -163,13 +164,13 @@ def load_trained_model() -> Sequential:
     return model
 
 
-def try_prediction(data: np.ndarray, model: Sequential):
+def try_prediction(data: np.ndarray, model: Sequential, batch_size: int):
     """
     receives data thgt wasn't used during training and the trained model
     do a prediction and returns the result.
     """
-    prediction = data[0:BATCH_SIZE]
-    prediction = model.predict(prediction, batch_size=BATCH_SIZE)
+    prediction = data[0:batch_size]
+    prediction = model.predict(prediction, batch_size=batch_size)
     return prediction[-1]
 
 

@@ -30,7 +30,7 @@ data, scaler = lstm.get_training_data(BEGINNING_DATE, ENDING_DATE, TICKER)
 x, y = lstm.process_data_for_lstm(data, NUM_TIMESTEPS, TIMESTEPS_AHEAD)
 xtrain, xtest, ytrain, ytest = lstm.divide_data_into_train_test(x, y, TRAIN_TEST_RATIO, BATCH_SIZE)
 #model = load_trained_model()
-model = lstm.create_model(data.shape[1], NUM_TIMESTEPS, BATCH_SIZE, OPTIMIZER, LOSS)
+model = lstm.create_model(data.shape[1], N_HIDDEN, NUM_TIMESTEPS, BATCH_SIZE, OPTIMIZER, LOSS)
 
 for i in range(NUM_EPOCHS // SAVE_EVERY):
     lstm.train_model(model, SAVE_EVERY, BATCH_SIZE, xtrain, ytrain, xtest, ytest)
@@ -38,7 +38,7 @@ for i in range(NUM_EPOCHS // SAVE_EVERY):
         os.mkdir('models')
     model.save('models/lstm.h5')
 
-    prediction = lstm.try_prediction(xtest, model)
+    prediction = lstm.try_prediction(xtest, model, BATCH_SIZE)
     prediction = lstm.scale_back_to_normal(prediction, scaler)
     test_data = lstm.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
     lstm.show_prediction(prediction, test_data)
