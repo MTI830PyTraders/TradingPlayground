@@ -29,8 +29,6 @@ TIMESTEPS_AHEAD = 90
 VERBOSE = 0
 
 # percentage of the data that will be used to train the model.
-# the test ration is the ratio below minus the backtest ratio.
-# so for example: 1.0 - 0.75 - 0.1 = 0.15 for test data
 TRAIN_TEST_RATIO = 0.8
 
 # setting the random seed allow to make the experiment reproductible
@@ -44,7 +42,7 @@ def get_training_data(beginning_date: str, ending_date: str, ticker: str) -> typ
     All the data will be normalized to a value between -1 and 1 to make it easier to train the model.
     The function returns the following values in a tuple:
     :return: data: a numpy array containing 3 columns: sentiment, stock value at closing time, free cash flow
-    :return: *_scaler: the MinMaxScalers used to normalize the data. Used to transform the data back to normal
+    :return: *_scaler: the MinMaxScaler used to normalize the data. Used to transform the data back to normal
     """
     train_data = download_data.get_training_dataset(beginning_date, ending_date, ticker)
 
@@ -118,8 +116,7 @@ def divide_data_into_train_test(x: np.ndarray,
     """
     receives the training data as numpy arrays. Will divide the data as follow:
     training data: main data used for training. will be the ratio of x and y
-    test data: used to validate while training the model: will be 1.0 - ratio - bt_ratio
-    backtest data: used to do a prediction once training is finished. will be bt_ratio of the data
+    test data: used to validate while training the model: will be 1.0 - ratio
     """
     sp = int(ratio * len(x))
 
@@ -154,7 +151,6 @@ def create_model(units: int,
     model.add(CuDNNLSTM(N_HIDDEN, return_sequences=True))
     model.add(Dropout(0.1))
     model.add(Dense(units))
-    #model.add(Activation('linear'))
     model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
 
     return model
@@ -220,7 +216,7 @@ def show_prediction(prediction: np.ndarray, reality: np.ndarray):
 
 def scale_back_to_normal(data: np.ndarray, scaler: preprocessing.MinMaxScaler) -> np.ndarray:
     """
-    receives data that was normalized as well as the MinMaxScalers used to do so.
+    receives data that was normalized as well as the MinMaxScaler used to do so.
     put the data back to normal and returns the result.
     """
     if len(data.shape) == 3:
