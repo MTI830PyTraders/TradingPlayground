@@ -4,7 +4,8 @@ import pandas as pd
 
 from concurrent.futures import ThreadPoolExecutor
 
-BEGINNING_DATE = '2017-03-31'
+
+BEGINNING_DATE = '2013-03-31'
 ENDING_DATE = '2018-03-31'
 _SHARADAR_API_KEY = open("sharadar.secret", "r").readline().strip()
 _WIKI_PRICES_KEY = open("wikiprices.secret", "r").readline().strip()

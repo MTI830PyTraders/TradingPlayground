@@ -34,7 +34,7 @@ echo "ticks count found on both files SF1|NS1 : $(wc -l ticks2keep.txt)"
 echo -e "### datasets cleanup phase ###\n"
 
 echo "cleanup SHARADAR SF1"
-time cat ticks2keep.txt | xargs -P 10   -I {} egrep --line-buffered  '^{},' SHARADAR_SF1_b4f396bf12b7322892a876eb11353fb7.csv > SF1.cleaned.csv
+time cat ticks2keep.txt  | xargs -P 10   -I {} egrep --line-buffered  '^{},' SHARADAR_SF1_b4f396bf12b7322892a876eb11353fb7.csv | grep ',MRQ,'  > SF1.cleaned.csv
 echo "cleanup SHARADAR SEP"
 time cat ticks2keep.txt | xargs -P 10   -I {} egrep --line-buffered  '^{},' SHARADAR_SEP_fb32049b0552692c7ed3619036acb940.csv > SEP.cleaned.csv
 echo "cleanup FINSENTS NS1"
