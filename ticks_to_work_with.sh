@@ -43,3 +43,4 @@ time cat ticks2keep.txt | xargs -P 10   -I {} egrep --line-buffered  '^{},' NS1_
 echo "on sharadar datasets, add headers provided by originals datasets"
 echo -e "$(head -n 1 SHARADAR_SEP_fb32049b0552692c7ed3619036acb940.csv)\n$(cat SEP.cleaned.csv)" > SEP.cleaned.csv
 echo -e "$(head -n 1 SHARADAR_SF1_b4f396bf12b7322892a876eb11353fb7.csv)\n$(cat SF1.cleaned.csv)" > SF1.cleaned.csv
+
