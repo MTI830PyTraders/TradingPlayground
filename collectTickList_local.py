@@ -34,12 +34,6 @@ sharadar_sep_xr = xr.open_dataset("sep.nc", chunks=30)
 sharadar_sf1_xr = xr.open_dataset("sf1.nc", chunks=30)
 
 
-sharadar_sf1_xr = sharadar_sf1_xr.stack(z=('datetime', 'ticker'))
-# print(sharadar_sf1_xr)
-finsents_xr = finsents_xr.stack(z=('datetime', 'ticker'))
-sharadar_sep_xr = sharadar_sep_xr.stack(z=('datetime', 'ticker'))
-
-
 # sharadar_sf1_xr = sharadar_sf1_xr.reindex_like(sharadar_sep_xr)
 print(sharadar_sf1_xr)
 merge1 = xr.merge([sharadar_sf1_xr, sharadar_sep_xr])
@@ -47,4 +41,4 @@ merge1 = xr.merge([sharadar_sf1_xr, sharadar_sep_xr])
 final_xr = xr.merge([merge1, finsents_xr])
 print(final_xr)
 
-final_xr.reset_index('z').to_netcdf('final_xr.nc')
+final_xr.to_netcdf('final_xr.nc')
