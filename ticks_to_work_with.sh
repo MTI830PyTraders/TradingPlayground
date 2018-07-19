@@ -23,10 +23,10 @@ echo "SF1 has $(wc -l sf1.ticks.tmp)\t ticks"
 echo "NS1 has $(wc -l ns1.ticks.tmp)\t ticks"
 
 # Keep only deduplicated ones
-cat sf1.ticks.tmp  ns1.tmp | sort | uniq -d > ticks2keep.txt
+cat sf1.ticks.tmp  ns1.ticks.tmp | sort | uniq -d > ticks2keep.txt
 
 # Remove temporary files
-rm  sf1.ticks.tmp ns1.tmp
+rm  sf1.ticks.tmp ns1.ticks.tmp
 
 echo "ticks to keep is in this file : ticks2keep.txt"
 echo "ticks count found on both files SF1|NS1 : $(wc -l ticks2keep.txt)"
@@ -34,8 +34,13 @@ echo "ticks count found on both files SF1|NS1 : $(wc -l ticks2keep.txt)"
 echo -e "### datasets cleanup phase ###\n"
 
 echo "cleanup SHARADAR SF1"
-time cat ticks2keep.txt | xargs -P 10   -I {} egrep --line-buffered  '^{},' SHARADAR_SF1_b4f396bf12b7322892a876eb11353fb7.csv > SF1.cleaned.csv
+time cat ticks2keep.txt  | xargs -P 10   -I {} egrep --line-buffered  '^{},' SHARADAR_SF1_b4f396bf12b7322892a876eb11353fb7.csv | grep ',MRQ,'  > SF1.cleaned.csv
 echo "cleanup SHARADAR SEP"
 time cat ticks2keep.txt | xargs -P 10   -I {} egrep --line-buffered  '^{},' SHARADAR_SEP_fb32049b0552692c7ed3619036acb940.csv > SEP.cleaned.csv
 echo "cleanup FINSENTS NS1"
 time cat ticks2keep.txt | xargs -P 10   -I {} egrep --line-buffered  '^{},' NS1_20180715_US_HALF-CLEANED.csv > NS1.cleaned.csv
+
+echo "on sharadar datasets, add headers provided by originals datasets"
+echo -e "$(head -n 1 SHARADAR_SEP_fb32049b0552692c7ed3619036acb940.csv)\n$(cat SEP.cleaned.csv)" > SEP.cleaned.csv
+echo -e "$(head -n 1 SHARADAR_SF1_b4f396bf12b7322892a876eb11353fb7.csv)\n$(cat SF1.cleaned.csv)" > SF1.cleaned.csv
+
