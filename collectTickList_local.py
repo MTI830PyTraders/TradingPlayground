@@ -41,4 +41,8 @@ merge1 = xr.merge([sharadar_sf1_xr, sharadar_sep_xr])
 final_xr = xr.merge([merge1, finsents_xr])
 print(final_xr)
 
+time = pd.date_range(final_xr.indexes.get('datetime').min(), final_xr.indexes.get('datetime').max(), freq='D')
+ds = xr.Dataset({'datetime': time})
+final_xr.reindex_like(ds)
+final_xr = final_xr.interpolate_na(method='linear')
 final_xr.to_netcdf('final_xr.nc')
