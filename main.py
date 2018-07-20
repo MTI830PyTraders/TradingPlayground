@@ -1,6 +1,7 @@
 import lstm
 import numpy as np
 import os
+import xarray as xr
 
 # Parameters of what data to select
 BEGINNING_DATE = '2013-03-31'
@@ -26,7 +27,12 @@ SEED = 1337
 np.random.seed(SEED)
 
 # actual code is done here. It is not wrapped in a function so that variables can be checked in a python console.
-data, scaler = lstm.get_training_data(BEGINNING_DATE, ENDING_DATE, TICKER)
+
+final_xr = xr.open_dataset("final_xr.nc", chunks=30)
+ds = final_xr.sel(ticker=TICKER)
+train_data = xr.Dataset({'Sentiment': ds.sentiment, 'close': ds['close'], 'fcf': ds.fcf}).to_dataframe().interpolate(limit_direction='both')
+
+data, scaler = lstm.prepare_training_data(train_data)
 x, y = lstm.process_data_for_lstm(data, NUM_TIMESTEPS, TIMESTEPS_AHEAD)
 xtrain, xtest, ytrain, ytest = lstm.divide_data_into_train_test(x, y, TRAIN_TEST_RATIO, BATCH_SIZE)
 #model = load_trained_model()

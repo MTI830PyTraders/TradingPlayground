@@ -13,16 +13,14 @@ import pandas as pd
 from sklearn import preprocessing
 
 
-def get_training_data(beginning_date: str, ending_date: str, ticker: str) -> typing.Tuple[np.ndarray, preprocessing.MinMaxScaler]:
+def prepare_training_data(train_data: pd.DataFrame) -> typing.Tuple[np.ndarray, preprocessing.MinMaxScaler]:
     """
-    Select the data for training the model.
+    Receive the data for training the model.
     All the data will be normalized to a value between -1 and 1 to make it easier to train the model.
     The function returns the following values in a tuple:
     :return: data: a numpy array containing 3 columns: sentiment, stock value at closing time, free cash flow
     :return: *_scaler: the MinMaxScaler used to normalize the data. Used to transform the data back to normal
     """
-    train_data = download_data.get_training_dataset(beginning_date, ending_date, ticker)
-
     sentiments_scaler = preprocessing.MinMaxScaler()
     close_scaler = preprocessing.MinMaxScaler()
     close_p_scaler = preprocessing.MinMaxScaler()
