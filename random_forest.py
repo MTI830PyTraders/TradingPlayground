@@ -63,3 +63,19 @@ fig = actuals_df.rename(columns={'close': "actual_close"}).plot(ax=ax).get_figur
 fig.show()
 
 # fig.savefig("./graphs/random forest without smoothing.png")
+predictions_df['ewma'] = predictions_df["close"].ewm(span=60).mean()
+predictions_df['actual_close'] = test['close']
+predictions_df['actual_close_ewma'] = predictions_df["actual_close"].ewm(span=60).mean()
+predictions_df.columns = ['predicted_close', 'average_predicted_close', 'actual_close', 'average_actual_close']
+predictions_plot = predictions_df.plot(title='Random Forest predicted prices after aligning & smoothing')
+predictions_plot.set_xlabel("Dates")
+predictions_plot.set_ylabel("Stock Prices")
+fig = predictions_plot.get_figure()
+fig.show()
+
+predictions_df_average = predictions_df[['average_predicted_close', 'actual_close']]
+predictions_plot = predictions_df_average.plot(title='Random Forest after aligning & smoothing')
+predictions_plot.set_xlabel("Dates")
+predictions_plot.set_ylabel("Stock Prices")
+fig = predictions_plot.get_figure()
+fig.show()
