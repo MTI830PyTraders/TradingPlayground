@@ -52,8 +52,8 @@ for i in range(NUM_EPOCHS // SAVE_EVERY):
     model.save('models/lstm.h5')
 
     prediction = lstm.try_prediction(xtest, model, BATCH_SIZE)
-    prediction = lstm.scale_back_to_normal(prediction, scaler)
-    test_data = lstm.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
+    prediction = data_manipulation.scale_back_to_normal(prediction, scaler)
+    test_data = data_manipulation.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
     lstm.show_prediction(prediction, test_data, f'plots/{TICKER}_{i}.png')
 
 score, _ = model.evaluate(xtest, ytest, batch_size=BATCH_SIZE)
