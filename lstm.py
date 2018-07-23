@@ -120,12 +120,12 @@ def create_model(units: int,
     """
     model = Sequential()
     model.add(CuDNNLSTM(n_hidden,
-                        stateful=true,
+                        stateful=True,
                         input_shape=(num_timesteps, units),
                         batch_input_shape=(batch_size, num_timesteps, units),
                         return_sequences=True))
     model.add(Dropout(0.1))
-    model.add(CuDNNLSTM(n_hidden, stateful=true, return_sequences=True))
+    model.add(CuDNNLSTM(n_hidden, stateful=True, return_sequences=True))
     model.add(Dropout(0.1))
     model.add(Dense(units))
     model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
