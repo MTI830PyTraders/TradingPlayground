@@ -3,10 +3,11 @@ import numpy as np
 import os
 import xarray as xr
 import math
+from keras.optimizers import Adam
 
 # Parameters of what data to select
 BEGINNING_DATE = '2013-03-31'
-ENDING_DATE = '2018-03-31'
+ENDING_DATE = '2018-06-31'
 TICKER = 'MSFT'
 
 # These parameters will tweak the model
@@ -16,7 +17,7 @@ N_HIDDEN = 1000
 NUM_EPOCHS = 100
 SAVE_EVERY = 10
 NUM_TIMESTEPS = 180
-OPTIMIZER = 'adam'
+OPTIMIZER = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
 TIMESTEPS_AHEAD = 90
 VERBOSE = 0
 
