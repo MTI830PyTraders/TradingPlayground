@@ -2,6 +2,7 @@ import lstm
 import numpy as np
 import os
 import xarray as xr
+import math
 
 # Parameters of what data to select
 BEGINNING_DATE = '2013-03-31'
@@ -48,3 +49,7 @@ for i in range(NUM_EPOCHS // SAVE_EVERY):
     prediction = lstm.scale_back_to_normal(prediction, scaler)
     test_data = lstm.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
     lstm.show_prediction(prediction, test_data)
+
+score, _ = model.evaluate(xtest, ytest, batch_size=BATCH_SIZE)
+rmse = math.sqrt(score)
+print("\nMSE: {:.3f}, RMSE: {:.3f}".format(score, rmse))
