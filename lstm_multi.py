@@ -1,3 +1,4 @@
+import data_manipulation
 import lstm
 import numpy as np
 import os
@@ -43,7 +44,7 @@ for i in tickers:
     ds = final_xr.sel(ticker=i)
     train_data = xr.Dataset({'Sentiment': ds.sentiment, 'close': ds['close'], 'fcf': ds.fcf}).to_dataframe(
     ).interpolate(limit_direction='both').resample('7D').mean()
-    data, scaler = lstm.prepare_training_data(train_data)
+    data, scaler = data_manipulation.prepare_training_data(train_data)
 
     if not model:
         model = lstm.create_model(data.shape[1], N_HIDDEN, NUM_TIMESTEPS,
@@ -58,8 +59,8 @@ for i in tickers:
         model.save('models/lstm.h5')
 
         prediction = lstm.try_prediction(xtest, model, BATCH_SIZE)
-        prediction = lstm.scale_back_to_normal(prediction, scaler)
-        test_data = lstm.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
+        prediction = data_manipulation.scale_back_to_normal(prediction, scaler)
+        test_data = data_manipulation.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
         lstm.show_prediction(prediction, test_data)
 
 score, _ = model.evaluate(xtest, ytest, batch_size=BATCH_SIZE)

@@ -1,3 +1,4 @@
+import data_manipulation
 import lstm
 import numpy as np
 import os
@@ -34,7 +35,11 @@ final_xr = xr.open_dataset("final_xr.nc", chunks=30)
 ds = final_xr.sel(ticker=TICKER)
 train_data = xr.Dataset({'Sentiment': ds.sentiment, 'close': ds['close'], 'fcf': ds.fcf}).to_dataframe().interpolate(limit_direction='both')
 
-data, scaler = lstm.prepare_training_data(train_data)
+data, scaler = data_manipulation.prepare_training_data(train_data)
+
+if not os.path.exists('plots'):
+    os.mkdir('plots')
+
 x, y = lstm.process_data_for_lstm(data, NUM_TIMESTEPS, TIMESTEPS_AHEAD)
 xtrain, xtest, ytrain, ytest = lstm.divide_data_into_train_test(x, y, TRAIN_TEST_RATIO, BATCH_SIZE)
 #model = load_trained_model()
@@ -47,9 +52,9 @@ for i in range(NUM_EPOCHS // SAVE_EVERY):
     model.save('models/lstm.h5')
 
     prediction = lstm.try_prediction(xtest, model, BATCH_SIZE)
-    prediction = lstm.scale_back_to_normal(prediction, scaler)
-    test_data = lstm.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
-    lstm.show_prediction(prediction, test_data)
+    prediction = data_manipulation.scale_back_to_normal(prediction, scaler)
+    test_data = data_manipulation.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
+    lstm.show_prediction(prediction, test_data, f'plots/{TICKER}_{i}.png')
 
 score, _ = model.evaluate(xtest, ytest, batch_size=BATCH_SIZE)
 rmse = math.sqrt(score)
