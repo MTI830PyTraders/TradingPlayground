@@ -75,11 +75,11 @@ def process_data_for_lstm(data: np.ndarray, num_timesteps: int, timesteps_ahead:
     strongly influence by source code from https://github.com/PacktPublishing/Deep-Learning-with-Keras/blob/master/Chapter06/econs_stateful.py
     """
     x = np.zeros((data.shape[0], num_timesteps, data.shape[1]))
-    y = np.zeros((data.shape[0], num_timesteps, data.shape[1]))
+    y = np.zeros((data.shape[0], num_timesteps, 1))
 
     for i in range(len(data) - num_timesteps - timesteps_ahead):
         x[i] = data[i:i + num_timesteps]
-        y[i] = data[i + timesteps_ahead:i + num_timesteps + timesteps_ahead]
+        y[i] = data[i + timesteps_ahead:i + num_timesteps + timesteps_ahead, 0:1]
 
     return x, y
 
@@ -127,7 +127,7 @@ def create_model(units: int,
     model.add(Dropout(0.1))
     model.add(CuDNNLSTM(n_hidden, stateful=True, return_sequences=True))
     model.add(Dropout(0.1))
-    model.add(Dense(units))
+    model.add(Dense(1))
     model.compile(loss=loss, optimizer=optimizer, metrics=["accuracy"])
 
     return model
