@@ -91,7 +91,7 @@ def create_model(units: int,
     model.add(Dropout(0.1))
     model.add(Dense(1))
     model.compile(loss=loss, optimizer=optimizer, metrics=['mean_squared_error', 'mape'])
-
+    print(model.summary())
     return model
 
 
