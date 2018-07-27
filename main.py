@@ -5,6 +5,7 @@ import os
 import xarray as xr
 import math
 from keras.optimizers import Adam
+import matplotlib.pyplot as plt
 
 # Parameters of what data to select
 BEGINNING_DATE = '2013-03-31'
@@ -56,6 +57,22 @@ for i in range(NUM_EPOCHS // SAVE_EVERY):
     test_data = data_manipulation.scale_back_to_normal(ytest[BATCH_SIZE], scaler)
     lstm.show_prediction(prediction, test_data, f'plots/{TICKER}_{i}.png')
 
-score, _ = model.evaluate(xtest, ytest, batch_size=BATCH_SIZE)
+    plt.close()
+    plt.plot(lstm.history.losses)
+    plt.plot(lstm.history.val_losses)
+    plt.title('model train vs validation loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper right')
+    plt.show()
+    plt.close()
+    plt.plot(lstm.history.mapes)
+    plt.title('mape')
+    plt.ylabel('mape')
+    plt.xlabel('epoch')
+    plt.legend(['mape'], loc='upper right')
+    plt.show()
+
+score, _, _ = model.evaluate(xtest, ytest, batch_size=BATCH_SIZE)
 rmse = math.sqrt(score)
 print("\nMSE: {:.3f}, RMSE: {:.3f}".format(score, rmse))

@@ -34,7 +34,9 @@ def prepare_training_data(train_data: pd.DataFrame) -> typing.Tuple[np.ndarray, 
     fcf = np.array(fcf).reshape((len(fcf), 1))
     fcf = fcf_scaler.fit_transform(fcf)
 
-    data = np.concatenate((close[1:], close_p, sentiments[1:], fcf[1:]), axis=1)
+    #return close, close_scaler
+    # data = np.concatenate((close[1:], close_p, sentiments[1:], fcf[1:]), axis=1)
+    data = np.concatenate((close[1:], sentiments[1:]), axis=1)
     return data, close_scaler
 
 

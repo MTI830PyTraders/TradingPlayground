@@ -1,11 +1,28 @@
 import typing
 
+from keras.callbacks import Callback
 from keras.models import Sequential, load_model
 from keras.layers.core import Dense, Dropout
 from keras.layers import CuDNNLSTM
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+class LossHistory(Callback):
+
+    def __init__(self):
+        super(Callback, self).__init__()
+        self.losses = []
+        self.val_losses = []
+        self.maes = []
+        self.mapes = []
+
+    def on_epoch_end(self, batch, logs={}):
+        self.losses.append(logs.get('loss'))
+        self.val_losses.append(logs.get('val_loss'))
+        self.maes.append(logs.get('val_mean_squared_error'))
+        self.mapes.append(logs.get('val_mean_absolute_percentage_error'))
 
 
 def process_data_for_lstm(data: np.ndarray, num_timesteps: int, timesteps_ahead: int) -> typing.Tuple[np.ndarray, np.ndarray]:
@@ -95,6 +112,9 @@ def create_model(units: int,
     return model
 
 
+history = LossHistory()
+
+
 def train_model(model: Sequential,
                 num_epochs: int,
                 batch_size: int,
@@ -109,12 +129,15 @@ def train_model(model: Sequential,
     """
     for i in range(num_epochs):
         print("Epoch {:d}/{:d}".format(i + 1, num_epochs))
+
         model.fit(xtrain,
                   ytrain,
                   batch_size=batch_size,
                   epochs=1,
                   validation_data=(xtest, ytest),
-                  shuffle=False)
+                  shuffle=False,
+                  callbacks=[history])
+
         model.reset_states()
 
 
