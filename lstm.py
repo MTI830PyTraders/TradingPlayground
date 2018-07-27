@@ -112,16 +112,15 @@ def create_model(units: int,
     return model
 
 
-history = LossHistory()
-
-
 def train_model(model: Sequential,
                 num_epochs: int,
                 batch_size: int,
                 xtrain: np.ndarray,
                 ytrain: np.ndarray,
                 xtest: np.ndarray,
-                ytest: np.ndarray):
+                ytest: np.ndarray,
+                extraCallback=[]
+                ):
     """
     train the model
     according to https://github.com/PacktPublishing/Deep-Learning-with-Keras/blob/master/Chapter06/econs_stateful.py
@@ -136,7 +135,7 @@ def train_model(model: Sequential,
                   epochs=1,
                   validation_data=(xtest, ytest),
                   shuffle=False,
-                  callbacks=[history])
+                  callbacks=extraCallback)
 
         model.reset_states()
 
@@ -158,7 +157,7 @@ def try_prediction(data: np.ndarray, model: Sequential, batch_size: int):
     return prediction[-1]
 
 
-def show_prediction(prediction: np.ndarray, reality: np.ndarray, file_name='plot.png'):
+def show_prediction(prediction: np.ndarray, reality: np.ndarray, ticker='', file_name='plot.png'):
     """
     receives the predicted data and the expected reality
     plot them side by side.
@@ -167,10 +166,17 @@ def show_prediction(prediction: np.ndarray, reality: np.ndarray, file_name='plot
     :param reality:
     :return:
     """
+
     predicted_var = ((prediction[-1, 0] - prediction[1, 0]) / prediction[-1, 0]) * 100
     actual_var = ((reality[-1, 0] - reality[1, 0]) / reality[-1, 0]) * 100
+    plt.close('all')
+    plt.figure()
+    fig, ax = plt.subplots()
+    ax.plot(prediction[:, 0])
+    ax.plot(reality[:, 0])
+    plt.title(f'{ticker}')
+    ax.legend(('prediction (' + str(round(predicted_var, 2)) + ')', 'reality (' + str(round(actual_var, 2)) + ')'))
 
-    plt.plot(prediction[:, 0])
-    plt.plot(reality[:, 0])
-    plt.legend(('prediction (' + str(round(predicted_var, 2)) + ')', 'reality (' + str(round(actual_var, 2)) + ')'))
-    plt.savefig(file_name)
+    fig.savefig(file_name)
+    plt.show()
+    plt.close('all')
