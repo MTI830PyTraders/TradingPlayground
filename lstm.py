@@ -6,6 +6,7 @@ from keras.layers.core import Dense, Dropout
 from keras.layers import CuDNNLSTM
 
 import matplotlib.pyplot as plt
+# plt.ioff()
 import numpy as np
 
 
@@ -178,5 +179,5 @@ def show_prediction(prediction: np.ndarray, reality: np.ndarray, ticker='', file
     ax.legend(('prediction (' + str(round(predicted_var, 2)) + ')', 'reality (' + str(round(actual_var, 2)) + ')'))
 
     fig.savefig(file_name)
-    plt.show()
+    # plt.show()
     plt.close('all')
