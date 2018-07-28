@@ -1,3 +1,5 @@
+import matplotlib
+# matplotlib.use('Agg')
 import data_manipulation
 import lstm
 import numpy as np
@@ -6,9 +8,9 @@ import xarray as xr
 import keras
 import math
 from keras.optimizers import Adam
-import matplotlib
-matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
+# plt.ioff()
 from keras.callbacks import CSVLogger
 import pdb
 
@@ -54,7 +56,12 @@ np.random.seed(SEED)
 
 # actual code is done here. It is not wrapped in a function so that variables can be checked in a python console.
 
-final_xr = xr.open_dataset("final_xr.nc", chunks=30)
+
+base_input = ['close']
+extra_input = ['sentiment', 'pe']
+input_list = base_input + extra_input
+
+final_xr = xr.open_dataset("final_xr.nc", chunks=30)[input_list]
 
 tickers = final_xr.get('ticker').values
 model = None
@@ -64,11 +71,11 @@ tickers = ['MCD', 'DIS', 'INTC', 'AAPL', 'MSFT', 'WDC']
 
 totalEpoch = 1
 history = lstm.LossHistory()
+
 for ticker in tickers:
     ds = final_xr.sel(ticker=ticker)
-    train_data = xr.Dataset({'Sentiment': ds.sentiment, 'close': ds['close'], 'fcf': ds.fcf}).to_dataframe(
-    ).interpolate(limit_direction='both')
-    data, scaler = data_manipulation.prepare_training_data(train_data)
+    train_data = ds.to_dataframe().interpolate(limit_direction='both')
+    data, scaler = data_manipulation.prepare_training_data(train_data, extra_input_list_str=extra_input)
 
     if not model:
         model = lstm.create_model(data.shape[1], N_HIDDEN, NUM_TIMESTEPS,
@@ -93,7 +100,6 @@ for ticker in tickers:
                              file_name=f"RESULTS/{CONFIG_ID}/predict/predictEpoch{totalEpoch}.png")
 
         plt.close("all")
-        # fig, ax = plt.subplots()
         history
         plt.plot(history.losses)
         plt.plot(history.val_losses)
@@ -104,7 +110,7 @@ for ticker in tickers:
         plt.savefig(f'RESULTS/{CONFIG_ID}/loss.png')
         plt.show()
         plt.close("all")
-        # fig, ax = plt.subplots()
+
         plt.figure()
         plt.plot(history.mapes)
         plt.title("mape - ticker: " + ticker)
