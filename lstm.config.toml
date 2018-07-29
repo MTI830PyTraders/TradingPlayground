@@ -58,7 +58,7 @@ TIMESTEPS_AHEAD = 7
 
 
 [peg_MCD]
-extra_input = ['peg']
+extra_input = ['eps']
 tickers = ['MCD']
 BATCH_SIZE = 90
 LOSS = 'mae'
@@ -148,7 +148,7 @@ TIMESTEPS_AHEAD = 7
 
 
 [peg_DIS]
-extra_input = ['peg']
+extra_input = ['eps']
 tickers = ['DIS']
 BATCH_SIZE = 90
 LOSS = 'mae'
@@ -223,7 +223,7 @@ TIMESTEPS_AHEAD = 7
 
 
 [peg_INTC]
-extra_input = ['peg']
+extra_input = ['eps']
 tickers = ['INTC']
 BATCH_SIZE = 90
 LOSS = 'mae'
@@ -297,7 +297,7 @@ TIMESTEPS_AHEAD = 7
 
 
 [peg_AAPL]
-extra_input = ['peg']
+extra_input = ['eps']
 tickers = ['AAPL']
 BATCH_SIZE = 90
 LOSS = 'mae'
@@ -372,7 +372,7 @@ TIMESTEPS_AHEAD = 7
 
 
 [peg_MSFT]
-extra_input = ['peg']
+extra_input = ['eps']
 tickers = ['MSFT']
 BATCH_SIZE = 90
 LOSS = 'mae'
@@ -445,7 +445,7 @@ TIMESTEPS_AHEAD = 7
 
 
 [peg_WDC]
-extra_input = ['peg']
+extra_input = ['eps']
 tickers = ['WDC']
 BATCH_SIZE = 90
 LOSS = 'mae'
