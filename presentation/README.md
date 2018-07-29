@@ -26,18 +26,24 @@
 -->
 
 # section Préambule
+## sous-section Déroulement de la présentation
+### frame Déroulement de la présentation
+* Introduction
+* Présentation de nos experts
+* Premières expériences
+* Méthodes
+* Résultats
+* Conclusion
+
 ## sous-section Introduction
 ### frame Introduction
-* Prédiction de la valeur des actions avec le deep learning
-* 
-* 
-* 
-## sous-section Objectifs
-### frame Objectifs
-* Utiliser l'analyse de sentiments pour prédire si l'on doit acheter ou vendre des actions
-* 
-* 
 ### graph xkcd
+
+### frame Objectif
+* Faire la prédiction de la valeur d'une action dans le futur avec le deep learning
+* Utiliser l'analyse de sentiments
+* Utiliser les différentes informations disponibles sur une compagnie
+
 ## sous-section Présentation de nos experts
 ### frame Présentation de Françis
 * Partenaire d'affaire de Mike
@@ -48,7 +54,7 @@
 ### frame Présentation de Carl 
 * Détient un MBA du HEC
 * Fondateur de la startup Evovest
-* 
+* Expert en finance et en machine learning
 * 
 ## sous-section Premières expériences
 ### frame Expérimentation avec sentiment140
@@ -81,6 +87,12 @@
 * Contient de l'information financière sur plus de 12 000 compagnies américaines
 * Chaque compagnie possède plus d'une centaine de colonnes d'information financière
 * Peut fournir de l'information sur une compagnie jusqu'à 20 ans dans le passé
+### frame Datasets
+* Combinaison possible des datasets avec la date et le ticker
+* Datasets disponibles sur Quandl
+* Possibilité d'utiliser l'API de Quandl
+* Possibilité de télécharger les datasets complets au format CSV
+* Datasets payants au coût de 50$ par mois
 
 # section Méthodes
 ## sous-section Préparation des données
@@ -91,21 +103,12 @@
 * 
 * 
 * 
-
-## sous-section Entrainement d'un modèle avec Random Forest 
-### frame Présentation de Random Forest 
-* 
-* 
-
 # section Résultats
-## sous-section Résultats avec Random Forest
-### frame Résultats avec Random Forest  
-* 
-* 
-* 
-
+## sous-section Résultats
 # section Conclusion
 ## sous-section Conclusion
+### frame Conclusion
+### graph xkcd
 ## sous-section Travaux futur
 ### frame Travaux futur
 * Évaluer la pertinence des autres attributs du dataset
