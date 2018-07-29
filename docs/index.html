@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>README.md</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="http://lab.hakim.se/reveal-js/css/reveal.css">
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="http://lab.hakim.se/reveal-js/css/theme/moon.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'http://lab.hakim.se/reveal-js/css/print/pdf.css' : 'http://lab.hakim.se/reveal-js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="http://lab.hakim.se/reveal-js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">README.md</h1>
+</section>
+
+<section><section id="mti830---étsmine-2018" class="title-slide slide level1"><h1>MTI830 - ÉTSMINE 2018</h1></section><section id="prédictions-des-marchés-de-capitaux-avec-lanalyse-de-sentiments" class="slide level2">
+<h2>Prédictions des marchés de capitaux avec l’analyse de sentiments</h2>
+<p>par Michael Faille et Benoit Paquet</p>
+</section></section>
+<section><section id="préambule" class="title-slide slide level1"><h1>Préambule</h1></section><section id="déroulement-de-la-présentation" class="slide level2">
+<h2>Déroulement de la présentation</h2>
+<ul>
+<li>Introduction</li>
+<li>Présentation de nos experts</li>
+<li>Premières expériences</li>
+<li>Méthodes</li>
+<li>Résultats</li>
+<li>Conclusion</li>
+</ul>
+</section><section id="introduction" class="slide level2">
+<h2>Introduction</h2>
+<p><img data-src="xkcd_half.jpg" /></p>
+</section><section id="objectif" class="slide level2">
+<h2>Objectif</h2>
+<h4 id="faire-la-prédiction-de-la-valeur-dune-action-dans-le-futur-avec">Faire la prédiction de la valeur d’une action dans le futur avec:</h4>
+<ul>
+<li>Le deep learning</li>
+<li>Le cours de la bourse</li>
+<li>L’analyse de sentiments</li>
+<li>Les informations financières des compagnies</li>
+</ul>
+</section></section>
+<section><section id="présentation-de-nos-experts" class="title-slide slide level1"><h1>Présentation de nos experts</h1></section><section id="présentation-de-francis" class="slide level2">
+<h2>Présentation de Francis</h2>
+<ul>
+<li>Partenaire d’affaire de Michael</li>
+<li>Ancien étudiant du MILA et diplômé en maîtrise à la Polytechnique</li>
+<li>Expert en Machine Learning et en investissement à la bourse</li>
+<li>a proposé l’hypothèse suivante:
+<ul>
+<li>Stock price * Sentiments = Discounted Cash Flow</li>
+</ul></li>
+</ul>
+</section><section id="présentation-de-carl" class="slide level2">
+<h2>Présentation de Carl</h2>
+<ul>
+<li>Détient un MBA du HEC</li>
+<li>Fondateur de la startup Evovest</li>
+<li>Expert en finance et en machine learning</li>
+</ul>
+</section></section>
+<section><section id="premières-expériences" class="title-slide slide level1"><h1>Premières expériences</h1></section><section id="expérimentation-avec-sentiment140" class="slide level2">
+<h2>Expérimentation avec sentiment140</h2>
+<h4 id="sentiment140-cest">Sentiment140 c’est:</h4>
+<ul>
+<li>1.6 millions de tweets disponible publiquement sur internet</li>
+<li>Publié par des étudiants en science informatique de l’université de Stanford</li>
+<li>Notre premier contact avec le deep learning</li>
+<li>Être capable d’attribuer un sentiment à une phrase grâce à un modèle</li>
+</ul>
+</section><section id="expérimentation-avec-sentiment140-1" class="slide level2">
+<h2>Expérimentation avec sentiment140</h2>
+<h4 id="nos-résultats-nous-ont-démontrés-quil">Nos résultats nous ont démontrés qu’il:</h4>
+<ul>
+<li>est difficile de corréler le sentiment avec la bourse</li>
+<li>nécessite beaucoup plus de travail pour valider le modèle</li>
+<li>nécessite encore plus de travail pour mettre la main sur un autre dataset de Twitter</li>
+</ul>
+</section></section>
+<section><section id="recommendations-de-nos-experts" class="title-slide slide level1"><h1>Recommendations de nos experts</h1></section><section id="dataset-finsents" class="slide level2">
+<h2>Dataset: FinSents</h2>
+<h4 id="caractéristiques">Caractéristiques:</h4>
+<ul>
+<li>Génère une valeur de sentiment par jour par compagnie</li>
+<li>La valeur provient de différentes sources:
+<ul>
+<li>Les journaux</li>
+<li>Différents réseaux sociaux (comme Twitter)</li>
+<li>Les blogues</li>
+</ul></li>
+<li>Dizaine de milliers de compagnies</li>
+<li>Offre d’autres colonnes tels le News Buzz et le News Volume</li>
+</ul>
+</section><section id="dataset-finsents-1" class="slide level2">
+<h2>Dataset: FinSents</h2>
+<h4 id="couvre-les-sentiments-de-compagnies-à-travers-le-monde">Couvre les sentiments de compagnies à travers le monde:</h4>
+<ul>
+<li>15 000 nord-américaines</li>
+<li>8 000 européennes</li>
+<li>4 000 japonaises</li>
+<li>14 000 asiatiques à l’exclusion du Japon</li>
+<li>3 000 Australie / Nouvelle-Zélande</li>
+<li>1 000 sud-américaines</li>
+</ul>
+</section><section id="dataset-sharadar" class="slide level2">
+<h2>Dataset: Sharadar</h2>
+<h4 id="source-dinformation-financière">Source d’information financière:</h4>
+<ul>
+<li>Sur plus de 12 000 compagnies américaines</li>
+<li>Représente plus d’une centaine d’attributs par compagnie</li>
+<li>Contient jusqu’à 20 ans d’historique</li>
+</ul>
+</section><section id="datasets" class="slide level2">
+<h2>Datasets</h2>
+<h4 id="possibilités-de-finsents-et-sharadar">Possibilités de FinSents et Sharadar:</h4>
+<ul>
+<li>Combinaison possible des datasets avec la date et le ticker</li>
+<li>disponibles sur Quandl</li>
+<li>Possibilité d’utiliser l’API de Quandl</li>
+<li>Possibilité de télécharger les datasets complets au format CSV</li>
+<li>Datasets payants au coût de 50$ par mois</li>
+</ul>
+</section></section>
+<section><section id="méthodes---préparation-des-données" class="title-slide slide level1"><h1>Méthodes - Préparation des données</h1></section><section id="datasets-1" class="slide level2">
+<h2>Datasets</h2>
+</section><section id="fusion-des-données" class="slide level2">
+<h2>Fusion des données</h2>
+</section><section id="entrainement-dun-modèle-avec-lstm" class="slide level2">
+<h2>Entrainement d’un modèle avec LSTM</h2>
+</section><section id="présentation-du-lstm" class="slide level2">
+<h2>Présentation du LSTM</h2>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+</section></section>
+<section><section id="résultats" class="title-slide slide level1"><h1>Résultats</h1></section></section>
+<section><section id="conclusion" class="title-slide slide level1"><h1>Conclusion</h1></section><section id="section" class="slide level2">
+<h2></h2>
+<p><img data-src="xkcd.jpg" /></p>
+</section><section id="travaux-futurs" class="slide level2">
+<h2>Travaux futurs</h2>
+<ul>
+<li>Évaluer la pertinence des autres attributs du dataset</li>
+<li>Tester avec plus de tickers</li>
+<li>Utiliser plusieurs tickers pour entrainer un même modèle</li>
+<li>Modifier les paramètres d’entrainement du modèle</li>
+<li>Entrainer d’autres types de modèles et comparer les résultats</li>
+</ul>
+</section><section id="remerciements" class="slide level2">
+<h2>Remerciements</h2>
+<h4 id="merci-à">Merci à:</h4>
+<ul>
+<li>Sylvie Ratté pour son suivi sur le projet</li>
+<li>Francis Piéraut pour nous avoir introduit ce projet</li>
+<li>Michael Faille pour avoir sollicité Francis Piéraut dans la définition du projet.</li>
+<li>Carl Dussault pour ses conseils sur la finance</li>
+</ul>
+</section><section id="questions" class="slide level2">
+<h2>Questions?</h2>
+<p>Merci pour votre attention!</p>
+<p>code source disponible à <br> https://github.com/MTI830PyTraders/TradingPlayground</p>
+</section></section>
+    </div>
+  </div>
+
+  <script src="http://lab.hakim.se/reveal-js/lib/js/head.min.js"></script>
+  <script src="http://lab.hakim.se/reveal-js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Push each slide change to the browser history
+        history: true,
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'http://lab.hakim.se/reveal-js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'http://lab.hakim.se/reveal-js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'http://lab.hakim.se/reveal-js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
