@@ -13,7 +13,7 @@ par Michael Faille et Benoit Paquet
 * Conclusion
 
 ## Introduction
-![](xkcd_half.jpg)
+![](docs/xkcd_half.jpg)
 
 ## Objectif
 #### Faire la prédiction de la valeur d'une action dans le futur avec: 
@@ -99,7 +99,7 @@ par Michael Faille et Benoit Paquet
 
 # Conclusion
 ##
-![](xkcd.jpg)
+![](docs/xkcd.jpg)
 
 ## Travaux futurs
 * Évaluer la pertinence des autres attributs du dataset
