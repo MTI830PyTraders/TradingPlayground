@@ -6,7 +6,7 @@ from keras.layers.core import Dense, Dropout
 from keras.layers import CuDNNLSTM
 
 import matplotlib.pyplot as plt
-# plt.ioff()
+plt.ioff()
 import numpy as np
 
 

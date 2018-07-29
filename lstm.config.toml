@@ -1,0 +1,13 @@
+[default]
+extra_input = ['sentiment', 'pe']
+tickers = ['MCD', 'DIS', 'INTC', 'AAPL', 'MSFT', 'WDC']
+BATCH_SIZE = 90
+LOSS = 'mae'
+N_HIDDEN = 1000
+NUM_EPOCHS = 100
+SAVE_EVERY = 10
+NUM_TIMESTEPS = 180
+LEARNING_RATE = 0.001
+BEGINNING_DATE = '2013-03-31'
+ENDING_DATE = '2018-06-31'
+TIMESTEPS_AHEAD = 90
