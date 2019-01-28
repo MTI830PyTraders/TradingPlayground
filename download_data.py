@@ -100,6 +100,21 @@ def get_training_dataset(beginning_date: str, ending_date: str, ticker: str, cas
     return final_df
 
 
+def _get_cashflow_event_date(beginning_date: str, ending_date: str, ticker: str, api_key: str) -> pd.DataFrame:
+    quandl.ApiConfig.api_key = api_key
+    cashflow_df = quandl.get_table('SHARADAR/EVENTS', ticker=ticker,
+                                   date={'gte': beginning_date, 'lte': ending_date}, paginate=True)
+    check_empty_df(cashflow_df)
+    cashflow_df = cashflow_df.sort_values(by='date')
+    cashflow_df = cashflow_df[['date', 'eventcodes']].set_index('date')
+    cashflow_df = cashflow_df[cashflow_df['eventcodes'].str.contains("22")]
+    # idx = pd.date_range(beginning_date, ending_date)
+    # cashflow_df.index = pd.DatetimeIndex(cashflow_df.index)
+    # cashflow_df = cashflow_df.reindex(idx, fill_value=np.NaN)
+
+    return cashflow_df
+
+
 def check_empty_df(df: pd.DataFrame):
     if df.empty:
         raise ValueError('df is empty.')
